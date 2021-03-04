@@ -39,34 +39,170 @@
             android:orientation="vertical"
             app:layout_constraintGuide_end="16dp" />
 
-
-        <TextView
-            android:id="@+id/header_title"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:text="@string/app_name"
-            android:textColor="@color/black"
-            android:textSize="18sp"
-            app:layout_constraintEnd_toEndOf="@id/rightGuideline"
-            app:layout_constraintStart_toStartOf="@id/leftGuideline"
-            app:layout_constraintTop_toTopOf="@id/topGuideline" />
-
-        <TextView
+        <LinearLayout
             android:id="@+id/header_des"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:orientation="vertical"
+            android:background="@color/blue_700"
+            app:layout_constraintBottom_toTopOf="@id/country_flag"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:id="@+id/header_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/app_name"
+                android:paddingStart="16dp"
+                android:paddingTop="8dp"
+                android:textColor="@color/white"
+                android:textSize="18sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Send Message Without Saving Contact"
+                android:textColor="@color/white"
+                android:paddingStart="16dp"
+                android:paddingTop="2dp"
+                android:textSize="12sp" />
+
+        </LinearLayout>
+
+
+        <ImageView
+            android:id="@+id/country_flag"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_marginTop="24dp"
+            android:contentDescription="Flag"
+            android:src="@drawable/flag_in"
+            app:layout_constraintEnd_toStartOf="@id/country_code"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            app:layout_constraintStart_toStartOf="@+id/leftGuideline"
+            app:layout_constraintTop_toBottomOf="@id/header_des" />
+
+
+        <TextView
+            android:id="@+id/country_code"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="+91"
+            android:textColor="@color/black_2"
+            android:textSize="18sp"
+            app:drawableEndCompat="@drawable/ic_expand_more"
+            app:layout_constraintBottom_toBottomOf="@+id/country_flag"
+            app:layout_constraintEnd_toStartOf="@id/phone"
+            app:layout_constraintStart_toEndOf="@id/country_flag"
+            app:layout_constraintTop_toTopOf="@+id/country_flag" />
+
+        <EditText
+            android:id="@+id/phone"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:focusedByDefault="false"
+            android:hint="Phone Number"
+            android:imeOptions="actionNext"
+            android:importantForAutofill="no"
+            android:inputType="phone"
+            app:layout_constraintBottom_toBottomOf="@+id/country_code"
+            app:layout_constraintEnd_toEndOf="@id/rightGuideline"
+            app:layout_constraintStart_toEndOf="@id/country_code"
+            app:layout_constraintTop_toTopOf="@+id/country_code" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_marginTop="2dp"
+            android:alpha="0.7"
+            android:background="@color/black_2"
+            app:layout_constraintEnd_toEndOf="@id/phone"
+            app:layout_constraintStart_toStartOf="@id/country_flag"
+            app:layout_constraintTop_toBottomOf="@id/country_flag" />
+
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/outlinedTextField"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Send Direct Message to Unsaved Contact"
-            android:textColor="@color/blue_700"
-            android:textSize="18sp"
+            android:layout_marginTop="16dp"
+            android:hint="Enter Message"
+            app:boxStrokeColor="@color/blue_700"
             app:layout_constraintEnd_toEndOf="@id/rightGuideline"
             app:layout_constraintStart_toStartOf="@id/leftGuideline"
-            app:layout_constraintTop_toBottomOf="@id/header_title" />
+            app:layout_constraintTop_toBottomOf="@id/phone"
+            app:startIconDrawable="@drawable/ic_chat"
+            app:startIconTint="@color/blue_700">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/message"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:imeOptions="actionDone"
+                android:inputType="textMultiLine" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/select_msg_head"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:includeFontPadding="false"
+            android:text="Or Select Message"
+            android:textColor="@color/black_2"
+            android:textSize="18sp"
+            app:layout_constraintEnd_toStartOf="@id/add_new_pre_filled_msg"
+            app:layout_constraintHorizontal_chainStyle="spread_inside"
+            app:layout_constraintStart_toStartOf="@id/leftGuideline"
+            app:layout_constraintTop_toBottomOf="@id/outlinedTextField" />
+
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/add_new_pre_filled_msg"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:drawableEnd="@drawable/ic_add"
+            android:drawablePadding="8dp"
+            android:includeFontPadding="false"
+            android:text="New"
+            android:textColor="@color/black_2"
+            android:textSize="18sp"
+            app:layout_constraintEnd_toEndOf="@id/rightGuideline"
+            app:layout_constraintStart_toEndOf="@id/select_msg_head"
+            app:layout_constraintTop_toBottomOf="@id/outlinedTextField" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/preMessagesRV"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="8dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/send_whatsapp"
+            app:layout_constraintTop_toBottomOf="@id/select_msg_head" />
+
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/send_whatsapp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="WhatsApp Message"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            app:layout_constraintTop_toBottomOf="@id/preMessagesRV"
+            app:layout_constraintBottom_toBottomOf="@id/bottomGuideline"
+            app:layout_constraintEnd_toStartOf="@id/rightGuideline"
+            app:layout_constraintStart_toStartOf="@id/leftGuideline"/>
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <include layout="@layout/countries_list"
-        android:id="@+id/lists"/>
+    <include layout="@layout/countries_list" />
 
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

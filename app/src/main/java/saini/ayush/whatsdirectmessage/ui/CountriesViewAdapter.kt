@@ -1,21 +1,19 @@
 package saini.ayush.whatsdirectmessage.ui
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import kotlinx.android.synthetic.main.country_list_item.view.*
 import saini.ayush.whatsdirectmessage.R
 import saini.ayush.whatsdirectmessage.model.Country
 
 class CountriesViewAdapter(
-    private val interaction: Interaction? = null,
-    private val selected: Int
+    private val interaction: Interaction? = null
 ) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
@@ -41,8 +39,7 @@ class CountriesViewAdapter(
                 parent,
                 false
             ),
-            interaction,
-            selected
+            interaction
         )
     }
 
@@ -65,26 +62,22 @@ class CountriesViewAdapter(
     class CountryViewHolder
     constructor(
         itemView: View,
-        private val interaction: Interaction?,
-        private val selected: Int
+        private val interaction: Interaction?
     ) : RecyclerView.ViewHolder(itemView) {
 
         fun bind(item: Country) = with(itemView) {
             itemView.setOnClickListener {
-                interaction?.onCountrySelected(adapterPosition, item)
+                interaction?.onCountrySelected(adapterPosition, item, country_selected)
             }
 
-            itemView.findViewById<TextView>(R.id.country_name).text = item.name
-            itemView.findViewById<TextView>(R.id.country_code).text = item.dialCode
-            itemView.findViewById<ImageView>(R.id.country_flag)
-                .setImageDrawable(ContextCompat.getDrawable(context, item.flag))
-            val selectedView = itemView.findViewById<ImageView>(R.id.country_selected)
-            if (selected == adapterPosition) selectedView.visibility = View.VISIBLE
-            else selectedView.visibility = View.INVISIBLE
+            country_name.text = item.name
+            country_code.text = item.dialCode
+            country_flag.setImageDrawable(ContextCompat.getDrawable(context, item.flag))
+            country_selected.visibility = View.INVISIBLE
         }
     }
 
     interface Interaction {
-        fun onCountrySelected(position: Int, item: Country)
+        fun onCountrySelected(position: Int, item: Country, imageView: ImageView)
     }
 }

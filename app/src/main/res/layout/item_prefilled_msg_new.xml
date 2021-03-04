@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <EditText
+        android:id="@+id/msg_new"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:background="@android:color/transparent"
+        android:drawableStart="@drawable/ic_add"
+        android:drawablePadding="8dp"
+        android:drawableTint="@color/blue_700"
+        android:gravity="center_vertical"
+        android:hint="Enter Message"
+        android:includeFontPadding="false"
+        android:padding="16dp"
+        android:textColor="@color/black"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/new_okay"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+    <ImageView
+        android:id="@+id/new_okay"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:contentDescription="remove"
+        android:padding="8dp"
+        android:src="@drawable/ic_check_circle"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/new_cancel"
+        app:layout_constraintStart_toEndOf="@id/msg_new"
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="@color/blue_700" />
+
+    <ImageView
+        android:id="@+id/new_cancel"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:contentDescription="remove"
+        android:padding="8dp"
+        android:src="@drawable/ic_close"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/new_okay"
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="@color/blue_700" />
+
+    <View
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:layout_marginTop="2dp"
+        android:alpha="0.5"
+        android:background="@color/black_2"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
