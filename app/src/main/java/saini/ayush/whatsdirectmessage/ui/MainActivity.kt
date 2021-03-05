@@ -5,6 +5,8 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.ImageView
@@ -15,6 +17,7 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.snackbar.Snackbar
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.countries_list.*
 import layout.PreFilledMsgAdapter
@@ -22,8 +25,10 @@ import saini.ayush.whatsdirectmessage.R
 import saini.ayush.whatsdirectmessage.model.Country
 import saini.ayush.whatsdirectmessage.model.Message
 import saini.ayush.whatsdirectmessage.utils.Constants.countries
+import saini.ayush.whatsdirectmessage.utils.DataManager
+import javax.inject.Inject
 
-
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity(), CountriesViewAdapter.Interaction,
     PreFilledMsgAdapter.Interaction, View.OnClickListener {
 
@@ -31,16 +36,20 @@ class MainActivity : AppCompatActivity(), CountriesViewAdapter.Interaction,
     private lateinit var messagesAdapter: PreFilledMsgAdapter
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<ConstraintLayout>
 
+    @Inject
+    lateinit var dataManager: DataManager
+
     private val viewModel: MainViewModel by viewModels()
-    val list: MutableList<Message> = mutableListOf()
+    private val list: MutableList<Message> = mutableListOf()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        setCountryCode()
+        list.addAll(dataManager.getMessages())
+
         initRV()
         initMessages()
-
+        setCountryCode()
         bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet)
 
         bottomSheetBehavior.addBottomSheetCallback(object :
@@ -68,6 +77,24 @@ class MainActivity : AppCompatActivity(), CountriesViewAdapter.Interaction,
         send_whatsapp.setOnClickListener(this)
 
         hideKeyboard()
+
+        message.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+            }
+
+            override fun afterTextChanged(s: Editable?) {
+                s?.let {
+                    if (it.isNotBlank()) {
+                        viewModel.message = it.toString()
+                    } else {
+                        viewModel.message = ""
+                    }
+                }
+            }
+        })
     }
 
     override fun onCountrySelected(position: Int, item: Country, imageView: ImageView) {
@@ -81,18 +108,25 @@ class MainActivity : AppCompatActivity(), CountriesViewAdapter.Interaction,
 
     override fun onItemSelected(position: Int, item: Message) {
         message.setText(item.message)
+        viewModel.message = item.message
     }
 
     override fun onEditClicked(position: Int, item: Message) {
-        list[position].editing = true
-        messagesAdapter.notifyItemChanged(position)
-        messagesAdapter.notifyItemRangeChanged(position, 1)
+        if (!viewModel.lock) {
+            viewModel.lock = true
+            list[position].editing = true
+            messagesAdapter.notifyItemChanged(position)
+            messagesAdapter.notifyItemRangeChanged(position, 1)
+        }
     }
 
     override fun onRemoveClicked(position: Int, item: Message) {
-        list.removeAt(position)
-        messagesAdapter.notifyItemRemoved(position)
-        messagesAdapter.notifyItemRangeChanged(position, 1)
+        if (!viewModel.lock) {
+            list.removeAt(position)
+            messagesAdapter.notifyItemRemoved(position)
+            messagesAdapter.notifyItemRangeChanged(position, 1)
+            dataManager.updateMessages(list)
+        }
 
     }
 
@@ -102,6 +136,8 @@ class MainActivity : AppCompatActivity(), CountriesViewAdapter.Interaction,
             list[position].message = newMsg
             messagesAdapter.notifyItemChanged(position)
             messagesAdapter.notifyItemRangeChanged(position, 1)
+            viewModel.lock = false
+            dataManager.updateMessages(list)
         } else {
             showSnackbar("Please enter new message")
         }
@@ -111,6 +147,7 @@ class MainActivity : AppCompatActivity(), CountriesViewAdapter.Interaction,
         list[position].editing = false
         messagesAdapter.notifyItemChanged(position)
         messagesAdapter.notifyItemRangeChanged(position, 1)
+        viewModel.lock = false
     }
 
     override fun onNewDone(position: Int, newMsg: String) {
@@ -119,6 +156,8 @@ class MainActivity : AppCompatActivity(), CountriesViewAdapter.Interaction,
             list[position].message = newMsg
             messagesAdapter.notifyItemChanged(position)
             messagesAdapter.notifyItemRangeChanged(position, 1)
+            viewModel.lock = false
+            dataManager.updateMessages(list)
         } else {
             showSnackbar("Please enter new message")
         }
@@ -128,6 +167,7 @@ class MainActivity : AppCompatActivity(), CountriesViewAdapter.Interaction,
         list.removeAt(position)
         messagesAdapter.notifyItemRemoved(position)
         messagesAdapter.notifyItemRangeChanged(position, 1)
+        viewModel.lock = false
     }
 
     override fun onClick(v: View?) {
@@ -155,7 +195,7 @@ class MainActivity : AppCompatActivity(), CountriesViewAdapter.Interaction,
                         String.format(
                             "https://api.whatsapp.com/send?phone=%s&text=%s",
                             phoneNumberWithCountryCode,
-                            message.text.toString()
+                            viewModel.message
                         )
                     )
                 )
@@ -171,26 +211,28 @@ class MainActivity : AppCompatActivity(), CountriesViewAdapter.Interaction,
     }
 
     private fun newMsgItem() {
-
-        if (list.size < 10) {
-            list.sortByDescending {
-                it.id
-            }
-            list.add(
-                0,
-                Message(
-                    id = 0,
-                    message = "",
-                    editing = false,
-                    new = true
+        if (!viewModel.lock) {
+            viewModel.lock = true
+            if (list.size < 10) {
+                list.sortByDescending {
+                    it.id
+                }
+                list.add(
+                    0,
+                    Message(
+                        id = 0,
+                        message = "",
+                        editing = false,
+                        new = true
+                    )
                 )
-            )
 
-            messagesAdapter.notifyItemInserted(0)
-            messagesAdapter.notifyItemRangeInserted(0, 0)
-            preMessagesRV.scrollToPosition(0)
+                messagesAdapter.notifyItemInserted(0)
+                messagesAdapter.notifyItemRangeInserted(0, 0)
+                preMessagesRV.scrollToPosition(0)
 
-        } else showSnackbar("Maximum messages can be 10")
+            } else showSnackbar("Maximum messages can be 10")
+        }
 
 
     }
@@ -207,29 +249,10 @@ class MainActivity : AppCompatActivity(), CountriesViewAdapter.Interaction,
             adapter = messagesAdapter
         }
 
-        messagesAdapter.submitList(getMessagesList())
+        messagesAdapter.submitList(list)
 
     }
 
-    private fun getMessagesList(): List<Message> {
-
-        for (i in 1..10) {
-            list.add(
-                Message(
-                    i,
-                    "Hello Sir $i",
-                    false,
-                    false
-                )
-            )
-        }
-
-        list.sortByDescending {
-            it.id
-        }
-
-        return list
-    }
 
     private fun setCountryCode() {
         country_flag.setImageDrawable(

@@ -5,6 +5,11 @@ import saini.ayush.whatsdirectmessage.model.Country
 
 object Constants {
 
+
+    const val MESSAGE_LIST = "preFilledMessageList"
+    const val COUNTRY_CODE = "countryCode"
+
+
     val countries = listOf(
 
         Country("AD", "Andorra", "+376", R.drawable.flag_ad),
