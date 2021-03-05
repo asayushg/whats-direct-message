@@ -40,12 +40,11 @@ class MainActivity : AppCompatActivity(), CountriesViewAdapter.Interaction,
     lateinit var dataManager: DataManager
 
     private val viewModel: MainViewModel by viewModels()
-    private val list: MutableList<Message> = mutableListOf()
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        list.addAll(dataManager.getMessages())
 
         initRV()
         initMessages()
@@ -60,7 +59,7 @@ class MainActivity : AppCompatActivity(), CountriesViewAdapter.Interaction,
 
             override fun onStateChanged(bottomSheet: View, newState: Int) {
 
-                viewModel.bottomSheetState = newState
+                viewModel.setBottomSheetValue(newState)
                 if (newState == BottomSheetBehavior.STATE_EXPANDED) {
                     hideKeyboard()
                 }
@@ -78,6 +77,27 @@ class MainActivity : AppCompatActivity(), CountriesViewAdapter.Interaction,
 
         hideKeyboard()
 
+        phone.setText(viewModel.contact)
+        message.setText(viewModel.message)
+
+        phone.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+            }
+
+            override fun afterTextChanged(s: Editable?) {
+                s?.let {
+                    if (it.isNotBlank()) {
+                        viewModel.setContactValue(it.toString())
+                    } else {
+                        viewModel.setContactValue("")
+                    }
+                }
+            }
+        })
+
         message.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
             }
@@ -88,9 +108,9 @@ class MainActivity : AppCompatActivity(), CountriesViewAdapter.Interaction,
             override fun afterTextChanged(s: Editable?) {
                 s?.let {
                     if (it.isNotBlank()) {
-                        viewModel.message = it.toString()
+                        viewModel.setMessageValue(it.toString())
                     } else {
-                        viewModel.message = ""
+                        viewModel.setMessageValue("")
                     }
                 }
             }
@@ -108,66 +128,72 @@ class MainActivity : AppCompatActivity(), CountriesViewAdapter.Interaction,
 
     override fun onItemSelected(position: Int, item: Message) {
         message.setText(item.message)
-        viewModel.message = item.message
+        viewModel.setMessageValue(item.message)
     }
 
     override fun onEditClicked(position: Int, item: Message) {
         if (!viewModel.lock) {
-            viewModel.lock = true
-            list[position].editing = true
+            viewModel.setLockValue(true)
+            viewModel.list[position].editing = true
             messagesAdapter.notifyItemChanged(position)
             messagesAdapter.notifyItemRangeChanged(position, 1)
+            viewModel.setListToState()
         }
     }
 
     override fun onRemoveClicked(position: Int, item: Message) {
         if (!viewModel.lock) {
-            list.removeAt(position)
+            viewModel.list.removeAt(position)
             messagesAdapter.notifyItemRemoved(position)
             messagesAdapter.notifyItemRangeChanged(position, 1)
-            dataManager.updateMessages(list)
+            dataManager.updateMessages(viewModel.list)
+            viewModel.setListToState()
         }
 
     }
 
     override fun onEditDone(position: Int, item: Message, newMsg: String) {
         if (newMsg.isNotEmpty()) {
-            list[position].editing = false
-            list[position].message = newMsg
+            viewModel.list[position].editing = false
+            viewModel.list[position].message = newMsg
             messagesAdapter.notifyItemChanged(position)
             messagesAdapter.notifyItemRangeChanged(position, 1)
-            viewModel.lock = false
-            dataManager.updateMessages(list)
+            viewModel.setLockValue(false)
+            dataManager.updateMessages(viewModel.list)
+            viewModel.setListToState()
         } else {
             showSnackbar("Please enter new message")
         }
     }
 
     override fun onEditCancel(position: Int) {
-        list[position].editing = false
+        viewModel.list[position].editing = false
         messagesAdapter.notifyItemChanged(position)
         messagesAdapter.notifyItemRangeChanged(position, 1)
-        viewModel.lock = false
+        viewModel.setLockValue(false)
+        viewModel.setListToState()
     }
 
     override fun onNewDone(position: Int, newMsg: String) {
         if (newMsg.isNotEmpty()) {
-            list[position].new = false
-            list[position].message = newMsg
+            viewModel.list[position].new = false
+            viewModel.list[position].message = newMsg
             messagesAdapter.notifyItemChanged(position)
             messagesAdapter.notifyItemRangeChanged(position, 1)
-            viewModel.lock = false
-            dataManager.updateMessages(list)
+            viewModel.setLockValue(false)
+            dataManager.updateMessages(viewModel.list)
+            viewModel.setListToState()
         } else {
             showSnackbar("Please enter new message")
         }
     }
 
     override fun onNewCancel(position: Int) {
-        list.removeAt(position)
+        viewModel.list.removeAt(position)
         messagesAdapter.notifyItemRemoved(position)
         messagesAdapter.notifyItemRangeChanged(position, 1)
-        viewModel.lock = false
+        viewModel.setLockValue(false)
+        viewModel.setListToState()
     }
 
     override fun onClick(v: View?) {
@@ -207,17 +233,17 @@ class MainActivity : AppCompatActivity(), CountriesViewAdapter.Interaction,
     }
 
     private fun getContact(): String {
-        return countries[viewModel.selectedCountry].dialCode + phone.text.toString()
+        return countries[viewModel.selectedCountry].dialCode + viewModel.contact
     }
 
     private fun newMsgItem() {
         if (!viewModel.lock) {
-            viewModel.lock = true
-            if (list.size < 10) {
-                list.sortByDescending {
+            viewModel.setLockValue(true)
+            if (viewModel.list.size < 10) {
+                viewModel.list.sortByDescending {
                     it.id
                 }
-                list.add(
+                viewModel.list.add(
                     0,
                     Message(
                         id = 0,
@@ -230,6 +256,7 @@ class MainActivity : AppCompatActivity(), CountriesViewAdapter.Interaction,
                 messagesAdapter.notifyItemInserted(0)
                 messagesAdapter.notifyItemRangeInserted(0, 0)
                 preMessagesRV.scrollToPosition(0)
+                viewModel.setListToState()
 
             } else showSnackbar("Maximum messages can be 10")
         }
@@ -249,7 +276,7 @@ class MainActivity : AppCompatActivity(), CountriesViewAdapter.Interaction,
             adapter = messagesAdapter
         }
 
-        messagesAdapter.submitList(list)
+        messagesAdapter.submitList(viewModel.list)
 
     }
 
@@ -279,7 +306,7 @@ class MainActivity : AppCompatActivity(), CountriesViewAdapter.Interaction,
 
     private fun openBottomSheet() {
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
-        viewModel.bottomSheetState = BottomSheetBehavior.STATE_EXPANDED
+        viewModel.setBottomSheetValue(BottomSheetBehavior.STATE_EXPANDED)
     }
 
     private fun onDoneClick() {
@@ -290,7 +317,7 @@ class MainActivity : AppCompatActivity(), CountriesViewAdapter.Interaction,
 
     private fun hideBottomSheet() {
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-        viewModel.bottomSheetState = BottomSheetBehavior.STATE_COLLAPSED
+        viewModel.setBottomSheetValue(BottomSheetBehavior.STATE_COLLAPSED)
     }
 
     fun Context.hideKeyboard(view: View) {
