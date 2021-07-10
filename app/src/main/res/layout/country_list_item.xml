@@ -9,7 +9,7 @@
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_margin="8dp"
-        android:contentDescription="Flag"
+        android:contentDescription="@string/flag"
         android:src="@drawable/flag_in"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -21,10 +21,10 @@
         android:layout_height="wrap_content"
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
-        android:text="INDIA"
+        android:text="@string/india"
         android:textColor="@color/black"
         android:textSize="21sp"
-        app:layout_constraintEnd_toStartOf="@id/country_selected"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/country_flag"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -34,11 +34,11 @@
         android:layout_height="wrap_content"
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
-        android:text="+91"
+        android:text="@string/_91"
         android:textColor="@color/black_2"
         android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/country_selected"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/country_flag"
         app:layout_constraintTop_toBottomOf="@id/country_name" />
 
@@ -52,18 +52,5 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@id/country_code"
         app:layout_constraintTop_toBottomOf="@id/country_code" />
-
-
-    <ImageView
-        android:id="@+id/country_selected"
-        android:layout_width="40dp"
-        android:layout_height="wrap_content"
-        android:layout_margin="8dp"
-        android:src="@drawable/ic_check_circle"
-        android:contentDescription="Selected"
-        android:visibility="invisible"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

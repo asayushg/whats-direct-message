@@ -1,13 +1,12 @@
 package saini.ayush.whatsdirectmessage.ui
 
-import android.widget.ImageView
-import androidx.hilt.Assisted
-import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import dagger.hilt.android.lifecycle.HiltViewModel
 import saini.ayush.whatsdirectmessage.model.Message
 import saini.ayush.whatsdirectmessage.utils.DataManager
+import javax.inject.Inject
 
 
 const val SAVE_STATE_MESSAGE = "ayush.whats.state.message"
@@ -16,11 +15,10 @@ const val SAVE_STATE_SHEET = "ayush.whats.state.sheet"
 const val SAVE_STATE_LOCK = "ayush.whats.state.lock"
 const val SAVE_STATE_MESSAGE_LIST = "ayush.whats.state.message.list"
 
-
+@HiltViewModel
 class MainViewModel
-@ViewModelInject
-constructor(
-    @Assisted private val savedStateHandle: SavedStateHandle,
+@Inject constructor(
+    private val savedStateHandle: SavedStateHandle,
     var dataManager: DataManager
 ) : ViewModel() {
 
@@ -29,7 +27,6 @@ constructor(
     var bottomSheetState = BottomSheetBehavior.STATE_COLLAPSED
     var selectedCountry = dataManager.getCountryCode()
     var temp_selectedCountry = dataManager.getCountryCode()
-    var tempSelectedView: ImageView? = null
     var lock = false
     var message: String = ""
     var contact: String = ""

@@ -67,17 +67,16 @@ class CountriesViewAdapter(
 
         fun bind(item: Country) = with(itemView) {
             itemView.setOnClickListener {
-                interaction?.onCountrySelected(adapterPosition, item, country_selected)
+                interaction?.onCountrySelected(adapterPosition, item)
             }
 
             country_name.text = item.name
             country_code.text = item.dialCode
             country_flag.setImageDrawable(ContextCompat.getDrawable(context, item.flag))
-            country_selected.visibility = View.INVISIBLE
         }
     }
 
     interface Interaction {
-        fun onCountrySelected(position: Int, item: Country, imageView: ImageView)
+        fun onCountrySelected(position: Int, item: Country)
     }
 }

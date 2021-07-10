@@ -9,13 +9,10 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
 import android.view.inputmethod.InputMethodManager
-import android.widget.ImageView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_main.*
@@ -28,48 +25,29 @@ import saini.ayush.whatsdirectmessage.utils.Constants.countries
 import saini.ayush.whatsdirectmessage.utils.DataManager
 import javax.inject.Inject
 
+
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity(), CountriesViewAdapter.Interaction,
     PreFilledMsgAdapter.Interaction, View.OnClickListener {
 
-    private lateinit var countriesViewAdapter: CountriesViewAdapter
     private lateinit var messagesAdapter: PreFilledMsgAdapter
-    private lateinit var bottomSheetBehavior: BottomSheetBehavior<ConstraintLayout>
 
     @Inject
     lateinit var dataManager: DataManager
 
     private val viewModel: MainViewModel by viewModels()
-
+    private lateinit var bottomSheet: CountryListDialog
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        initRV()
         initMessages()
         setCountryCode()
-        bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet)
+        setListeners()
+    }
 
-        bottomSheetBehavior.addBottomSheetCallback(object :
-            BottomSheetBehavior.BottomSheetCallback() {
-            override fun onSlide(bottomSheet: View, slideOffset: Float) {
-
-            }
-
-            override fun onStateChanged(bottomSheet: View, newState: Int) {
-
-                viewModel.setBottomSheetValue(newState)
-                if (newState == BottomSheetBehavior.STATE_EXPANDED) {
-                    hideKeyboard()
-                }
-            }
-        })
-
-        bottomSheetBehavior.state = viewModel.bottomSheetState
-
-        cancel_button.setOnClickListener(this)
-        done_button.setOnClickListener(this)
+    private fun setListeners() {
         country_flag.setOnClickListener(this)
         country_code.setOnClickListener(this)
         add_new_pre_filled_msg.setOnClickListener(this)
@@ -117,13 +95,9 @@ class MainActivity : AppCompatActivity(), CountriesViewAdapter.Interaction,
         })
     }
 
-    override fun onCountrySelected(position: Int, item: Country, imageView: ImageView) {
-        viewModel.tempSelectedView?.let {
-            it.visibility = View.INVISIBLE
-        }
+    override fun onCountrySelected(position: Int, item: Country) {
         viewModel.temp_selectedCountry = position
-        imageView.visibility = View.VISIBLE
-        viewModel.tempSelectedView = imageView
+        onDoneClick()
     }
 
     override fun onItemSelected(position: Int, item: Message) {
@@ -199,8 +173,6 @@ class MainActivity : AppCompatActivity(), CountriesViewAdapter.Interaction,
     override fun onClick(v: View?) {
         when (v?.id) {
 
-            R.id.cancel_button -> hideBottomSheet()
-            R.id.done_button -> onDoneClick()
             R.id.country_flag -> openBottomSheet()
             R.id.country_code -> openBottomSheet()
             R.id.add_new_pre_filled_msg -> newMsgItem()
@@ -212,24 +184,37 @@ class MainActivity : AppCompatActivity(), CountriesViewAdapter.Interaction,
     private fun sendMessage() {
 
         val phoneNumberWithCountryCode = getContact()
-
-        try {
-            startActivity(
-                Intent(
-                    Intent.ACTION_VIEW,
-                    Uri.parse(
-                        String.format(
-                            "https://api.whatsapp.com/send?phone=%s&text=%s",
-                            phoneNumberWithCountryCode,
-                            viewModel.message
-                        )
-                    )
+        if (validatePhoneNumber()) {
+            Snackbar.make(header_title, "Please enter mobile number", Snackbar.LENGTH_LONG).show()
+        } else {
+            val uri = Uri.parse(
+                String.format(
+                    "https://api.whatsapp.com/send?phone=%s&text=%s",
+                    phoneNumberWithCountryCode,
+                    viewModel.message
                 )
             )
-        } catch (e: Exception) {
-
+            try {
+                val intent = Intent(
+                    Intent.ACTION_VIEW,
+                    uri
+                )
+                intent.setPackage("com.whatsapp")
+                startActivity(intent)
+            } catch (e: Exception) {
+                startActivity(
+                    Intent(
+                        Intent.ACTION_VIEW,
+                        uri
+                    )
+                )
+            }
         }
 
+    }
+
+    private fun validatePhoneNumber(): Boolean {
+        return viewModel.contact.isEmpty()
     }
 
     private fun getContact(): String {
@@ -292,32 +277,15 @@ class MainActivity : AppCompatActivity(), CountriesViewAdapter.Interaction,
         country_code.text = countries[viewModel.selectedCountry].dialCode
     }
 
-    private fun initRV() {
-
-        countryListRV.apply {
-            layoutManager = LinearLayoutManager(this@MainActivity)
-            countriesViewAdapter =
-                CountriesViewAdapter(this@MainActivity)
-            adapter = countriesViewAdapter
-        }
-
-        countriesViewAdapter.submitList(countries)
-    }
-
     private fun openBottomSheet() {
-        bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
-        viewModel.setBottomSheetValue(BottomSheetBehavior.STATE_EXPANDED)
+        bottomSheet = CountryListDialog()
+        bottomSheet.show(supportFragmentManager, "TAG")
     }
 
     private fun onDoneClick() {
-        hideBottomSheet()
         viewModel.onDoneCountry()
         setCountryCode()
-    }
-
-    private fun hideBottomSheet() {
-        bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-        viewModel.setBottomSheetValue(BottomSheetBehavior.STATE_COLLAPSED)
+        bottomSheet.dismiss()
     }
 
     fun Context.hideKeyboard(view: View) {

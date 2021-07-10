@@ -78,7 +78,7 @@ constructor(
 
     fun getCountryCode(): Int {
 
-        return pref.getInt(COUNTRY_CODE, 0)
+        return pref.getInt(COUNTRY_CODE, 104)
 
     }
 
