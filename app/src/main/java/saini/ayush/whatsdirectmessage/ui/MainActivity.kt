@@ -96,7 +96,7 @@ class MainActivity : AppCompatActivity(), CountriesViewAdapter.Interaction,
     }
 
     override fun onCountrySelected(position: Int, item: Country) {
-        viewModel.temp_selectedCountry = position
+        viewModel.temp_selectedCountry = item
         onDoneClick()
     }
 
@@ -218,7 +218,7 @@ class MainActivity : AppCompatActivity(), CountriesViewAdapter.Interaction,
     }
 
     private fun getContact(): String {
-        return countries[viewModel.selectedCountry].dialCode + viewModel.contact
+        return viewModel.selectedCountry.dialCode + viewModel.contact
     }
 
     private fun newMsgItem() {
@@ -270,11 +270,11 @@ class MainActivity : AppCompatActivity(), CountriesViewAdapter.Interaction,
         country_flag.setImageDrawable(
             ContextCompat.getDrawable(
                 baseContext,
-                countries[viewModel.selectedCountry].flag
+                viewModel.selectedCountry.flag
             )
         )
 
-        country_code.text = countries[viewModel.selectedCountry].dialCode
+        country_code.text = viewModel.selectedCountry.dialCode
     }
 
     private fun openBottomSheet() {
@@ -288,13 +288,13 @@ class MainActivity : AppCompatActivity(), CountriesViewAdapter.Interaction,
         bottomSheet.dismiss()
     }
 
-    fun Context.hideKeyboard(view: View) {
+    private fun Context.hideKeyboard(view: View) {
         val inputMethodManager =
             getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
         inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0)
     }
 
-    fun Activity.hideKeyboard() {
+    private fun Activity.hideKeyboard() {
         hideKeyboard(currentFocus ?: View(this))
     }
 

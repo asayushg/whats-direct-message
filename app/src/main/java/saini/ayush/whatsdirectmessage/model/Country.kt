@@ -1,6 +1,6 @@
 package saini.ayush.whatsdirectmessage.model
 
-import saini.ayush.whatsdirectmessage.R
+import java.io.Serializable
 
 data class Country(
 
@@ -9,4 +9,4 @@ data class Country(
     val dialCode:String,
     val flag:Int
 
-)
+): Serializable

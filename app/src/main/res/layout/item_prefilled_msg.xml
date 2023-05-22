@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="?attr/colorSecondary"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
@@ -10,10 +11,10 @@
         android:layout_height="match_parent"
         android:drawableStart="@drawable/ic_chat"
         android:drawablePadding="8dp"
-        android:drawableTint="@color/blue_700"
+        android:drawableTint="?attr/colorPrimary"
         android:padding="16dp"
         android:text="@string/app_name"
-        android:textColor="@color/black"
+        android:textColor="?attr/colorOnSecondary"
         android:textSize="18sp"
         android:includeFontPadding="false"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -33,7 +34,7 @@
         app:layout_constraintStart_toEndOf="@id/msg"
         app:layout_constraintTop_toTopOf="parent"
         android:padding="8dp"
-        app:tint="@color/blue_700"
+        app:tint="?attr/colorPrimary"
         android:contentDescription="edit" />
 
 
@@ -47,7 +48,7 @@
         app:layout_constraintStart_toEndOf="@id/edit"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:tint="@color/blue_700"
+        app:tint="?attr/colorPrimary"
         android:contentDescription="remove" />
 
     <View
@@ -55,7 +56,7 @@
         android:layout_height="1dp"
         android:layout_marginTop="2dp"
         android:alpha="0.5"
-        android:background="@color/black_2"
+        android:background="?attr/colorSecondaryVariant"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />

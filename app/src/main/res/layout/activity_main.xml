@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
+    android:background="?attr/colorSecondary"
     tools:context=".ui.MainActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -44,7 +44,7 @@
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:orientation="vertical"
-            android:background="@color/blue_700"
+            android:background="?attr/colorPrimaryVariant"
             app:layout_constraintBottom_toTopOf="@id/country_flag"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -57,14 +57,14 @@
                 android:text="@string/app_name"
                 android:paddingStart="16dp"
                 android:paddingTop="8dp"
-                android:textColor="@color/white"
+                android:textColor="?attr/colorOnPrimary"
                 android:textSize="18sp" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/send_message_without_saving_contact"
-                android:textColor="@color/white"
+                android:textColor="?attr/colorOnPrimary"
                 android:paddingStart="16dp"
                 android:paddingTop="2dp"
                 android:textSize="12sp" />
@@ -90,9 +90,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/_91"
-            android:textColor="@color/black_2"
+            android:textColor="?attr/colorOnSecondary"
             android:textSize="18sp"
             app:drawableEndCompat="@drawable/ic_expand_more"
+            android:drawableTint="?attr/colorSecondaryVariant"
             app:layout_constraintBottom_toBottomOf="@+id/country_flag"
             app:layout_constraintEnd_toStartOf="@id/phone"
             app:layout_constraintStart_toEndOf="@id/country_flag"
@@ -107,6 +108,8 @@
             android:imeOptions="actionNext"
             android:importantForAutofill="no"
             android:inputType="phone"
+            android:background="?attr/colorSecondary"
+            android:textColor="?attr/colorOnSecondary"
             app:layout_constraintBottom_toBottomOf="@+id/country_code"
             app:layout_constraintEnd_toEndOf="@id/rightGuideline"
             app:layout_constraintStart_toEndOf="@id/country_code"
@@ -136,16 +139,31 @@
             app:layout_constraintStart_toStartOf="@id/leftGuideline"
             app:layout_constraintTop_toBottomOf="@id/phone"
             app:startIconDrawable="@drawable/ic_chat"
-            app:startIconTint="@color/blue_700">
+            app:startIconTint="?attr/colorPrimary">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/message"
                 android:layout_width="match_parent"
+                android:background="?attr/colorSecondary"
+                android:textColor="?attr/colorOnSecondary"
                 android:layout_height="wrap_content"
                 android:imeOptions="actionDone"
                 android:inputType="textMultiLine" />
 
         </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/send_whatsapp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/whatsapp_message"
+            android:textAllCaps="false"
+            android:backgroundTint="?attr/colorPrimaryVariant"
+            android:textColor="?attr/colorOnPrimary"
+            app:layout_constraintTop_toBottomOf="@id/outlinedTextField"
+            app:layout_constraintBottom_toTopOf="@id/select_msg_head"
+            app:layout_constraintEnd_toStartOf="@id/rightGuideline"
+            app:layout_constraintStart_toStartOf="@id/leftGuideline"/>
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/select_msg_head"
@@ -154,12 +172,12 @@
             android:layout_marginTop="16dp"
             android:includeFontPadding="false"
             android:text="@string/or_select_message"
-            android:textColor="@color/black_2"
+            android:textColor="?attr/colorOnSecondary"
             android:textSize="18sp"
             app:layout_constraintEnd_toStartOf="@id/add_new_pre_filled_msg"
             app:layout_constraintHorizontal_chainStyle="spread_inside"
             app:layout_constraintStart_toStartOf="@id/leftGuideline"
-            app:layout_constraintTop_toBottomOf="@id/outlinedTextField" />
+            app:layout_constraintTop_toBottomOf="@id/send_whatsapp" />
 
 
         <com.google.android.material.textview.MaterialTextView
@@ -170,12 +188,13 @@
             android:drawableEnd="@drawable/ic_add"
             android:drawablePadding="8dp"
             android:includeFontPadding="false"
+            android:drawableTint="?attr/colorOnSecondary"
             android:text="@string/newString"
-            android:textColor="@color/black_2"
+            android:textColor="?attr/colorOnSecondary"
             android:textSize="18sp"
             app:layout_constraintEnd_toEndOf="@id/rightGuideline"
             app:layout_constraintStart_toEndOf="@id/select_msg_head"
-            app:layout_constraintTop_toBottomOf="@id/outlinedTextField" />
+            app:layout_constraintTop_toBottomOf="@id/send_whatsapp" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/preMessagesRV"
@@ -184,21 +203,10 @@
             android:layout_marginTop="8dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintBottom_toTopOf="@id/send_whatsapp"
+            tools:listitem="@layout/item_prefilled_msg"
+            app:layout_constraintBottom_toBottomOf="@id/bottomGuideline"
             app:layout_constraintTop_toBottomOf="@id/select_msg_head" />
 
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/send_whatsapp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/whatsapp_message"
-            android:textAllCaps="false"
-            android:textColor="@color/white"
-            app:layout_constraintTop_toBottomOf="@id/preMessagesRV"
-            app:layout_constraintBottom_toBottomOf="@id/bottomGuideline"
-            app:layout_constraintEnd_toStartOf="@id/rightGuideline"
-            app:layout_constraintStart_toStartOf="@id/leftGuideline"/>
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

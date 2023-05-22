@@ -3,6 +3,8 @@ package saini.ayush.whatsdirectmessage.ui
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Filter
+import android.widget.Filterable
 import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.AsyncListDiffer
@@ -15,7 +17,7 @@ import saini.ayush.whatsdirectmessage.model.Country
 class CountriesViewAdapter(
     private val interaction: Interaction? = null
 ) :
-    RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+    RecyclerView.Adapter<RecyclerView.ViewHolder>(), Filterable {
 
     private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<Country>() {
 
@@ -29,7 +31,7 @@ class CountriesViewAdapter(
 
     }
     private val differ = AsyncListDiffer(this, DIFF_CALLBACK)
-
+    private var countriesList = listOf<Country>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
 
@@ -55,7 +57,39 @@ class CountriesViewAdapter(
         return differ.currentList.size
     }
 
+    override fun getFilter(): Filter {
+        var countriesFilteredList: List<Country>
+        return object : Filter() {
+            override fun performFiltering(constraint: CharSequence?): FilterResults {
+                val charString = constraint?.toString() ?: ""
+                countriesFilteredList = if (charString.isEmpty()) countriesList else {
+                    val filteredList = ArrayList<Country>()
+                    countriesList
+                        .filter {
+                            (it.name.lowercase().contains(constraint!!.toString().trim().lowercase())) or
+                                    (it.code.lowercase().contains(constraint.toString().trim().lowercase()))
+
+                        }
+                        .forEach { filteredList.add(it) }
+                    filteredList
+
+                }
+                return FilterResults().apply { values = countriesFilteredList }
+            }
+
+            override fun publishResults(constraint: CharSequence?, results: FilterResults?) {
+
+                countriesFilteredList = if (results?.values == null)
+                    ArrayList()
+                else
+                    results.values as List<Country>
+                differ.submitList(countriesFilteredList)
+            }
+        }
+    }
+
     fun submitList(list: List<Country>) {
+        countriesList = list
         differ.submitList(list)
     }
 

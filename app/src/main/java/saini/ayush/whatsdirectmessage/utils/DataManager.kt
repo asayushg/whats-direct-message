@@ -3,7 +3,9 @@ package saini.ayush.whatsdirectmessage.utils
 import android.content.SharedPreferences
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import saini.ayush.whatsdirectmessage.R
 import saini.ayush.whatsdirectmessage.di.Data
+import saini.ayush.whatsdirectmessage.model.Country
 import saini.ayush.whatsdirectmessage.model.Message
 import saini.ayush.whatsdirectmessage.utils.Constants.COUNTRY_CODE
 import saini.ayush.whatsdirectmessage.utils.Constants.MESSAGE_LIST
@@ -48,7 +50,7 @@ constructor(
         val msgList = mutableListOf<String>()
         msgList.add("Hello!")
         msgList.add("Hey, Ayush Here")
-        msgList.add("These are the prefilled messages. Tap to set this as message.")
+        msgList.add("Tap to set this as message.")
         msgList.add("You can edit, delete and add new custom messages")
         msgList.add("Maximum 10 messages can be saved")
 
@@ -70,16 +72,14 @@ constructor(
         return list
     }
 
-    fun updateCountryCode(int: Int) {
-
-        prefEditor.putInt(COUNTRY_CODE, int).apply()
-
+    fun updateCountryCode(country: Country) {
+        prefEditor.putString(COUNTRY_CODE, Gson().toJson(country)).apply()
     }
 
-    fun getCountryCode(): Int {
-
-        return pref.getInt(COUNTRY_CODE, 104)
-
+    fun getCountryCode(): Country {
+        val country = pref.getString(COUNTRY_CODE, "IN").toString()
+        if (country == "I") return Country("IN", "India", "+91", R.drawable.flag_in)
+        return Gson().fromJson(country, Country::class.java)
     }
 
 }

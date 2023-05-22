@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import dagger.hilt.android.lifecycle.HiltViewModel
+import saini.ayush.whatsdirectmessage.model.Country
 import saini.ayush.whatsdirectmessage.model.Message
 import saini.ayush.whatsdirectmessage.utils.DataManager
 import javax.inject.Inject
@@ -25,8 +26,8 @@ class MainViewModel
 
     // get from savedState
     var bottomSheetState = BottomSheetBehavior.STATE_COLLAPSED
-    var selectedCountry = dataManager.getCountryCode()
-    var temp_selectedCountry = dataManager.getCountryCode()
+    var selectedCountry: Country = dataManager.getCountryCode()
+    var temp_selectedCountry: Country = dataManager.getCountryCode()
     var lock = false
     var message: String = ""
     var contact: String = ""
