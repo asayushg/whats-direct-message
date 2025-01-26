@@ -78,7 +78,7 @@ constructor(
 
     fun getCountryCode(): Country {
         val country = pref.getString(COUNTRY_CODE, "IN").toString()
-        if (country == "I") return Country("IN", "India", "+91", R.drawable.flag_in)
+        if (country == "IN") return Country("IN", "India", "+91", R.drawable.flag_in)
         return Gson().fromJson(country, Country::class.java)
     }
 

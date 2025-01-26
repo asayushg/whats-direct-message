@@ -1,25 +1,24 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 buildscript {
-    ext.kotlin_version = "1.5.10"
+    ext {
+        agp_version = '8.5.1' // Latest stable version of the Android Gradle Plugin
+        kotlin_version = "1.9.10" // Latest stable version of Kotlin
+    }
     repositories {
         google()
-        jcenter()
+        mavenCentral() // Use mavenCentral instead of deprecated jcenter
     }
     dependencies {
-        classpath "com.android.tools.build:gradle:4.1.2"
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-
-        classpath 'com.google.dagger:hilt-android-gradle-plugin:2.35'
-
-        // NOTE: Do not place your application dependencies here; they belong
-        // in the individual module build.gradle files
+        classpath "com.android.tools.build:gradle:$agp_version" // Android Gradle Plugin
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version" // Kotlin Gradle Plugin
+        classpath "com.google.dagger:hilt-android-gradle-plugin:2.51.1" // Hilt Gradle Plugin
     }
 }
 
 allprojects {
     repositories {
         google()
-        jcenter()
+        mavenCentral() // Ensure consistency across projects
     }
 }
 

@@ -3,12 +3,12 @@ package layout
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
+import android.widget.ImageView
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.synthetic.main.item_prefilled_msg.view.*
-import kotlinx.android.synthetic.main.item_prefilled_msg_edit.view.*
-import kotlinx.android.synthetic.main.item_prefilled_msg_new.view.*
+import com.google.android.material.textview.MaterialTextView
 import saini.ayush.whatsdirectmessage.R
 import saini.ayush.whatsdirectmessage.model.Message
 
@@ -125,12 +125,12 @@ class PreFilledMsgAdapter(private val interaction: Interaction? = null) :
                 interaction?.onItemSelected(adapterPosition, item)
             }
 
-            msg.text = item.message
-            edit.setOnClickListener {
+            findViewById<MaterialTextView>(R.id.msg).text = item.message
+            findViewById<ImageView>(R.id.edit).setOnClickListener {
                 interaction?.onEditClicked(adapterPosition, item)
             }
 
-            remove.setOnClickListener {
+            findViewById<ImageView>(R.id.remove).setOnClickListener {
                 interaction?.onRemoveClicked(adapterPosition, item)
             }
 
@@ -145,13 +145,14 @@ class PreFilledMsgAdapter(private val interaction: Interaction? = null) :
 
         fun bind(item: Message) = with(itemView) {
 
-            msg_edit.setText(item.message)
+            val msgEdit= findViewById<EditText>(R.id.msg_edit)
+            msgEdit.setText(item.message)
 
-            okay.setOnClickListener {
-                interaction?.onEditDone(adapterPosition, item, msg_edit.text.toString())
+            findViewById<ImageView>(R.id.okay).setOnClickListener {
+                interaction?.onEditDone(adapterPosition, item, msgEdit.text.toString())
             }
 
-            cancel.setOnClickListener {
+            findViewById<ImageView>(R.id.cancel).setOnClickListener {
                 interaction?.onEditCancel(adapterPosition)
             }
 
@@ -166,13 +167,14 @@ class PreFilledMsgAdapter(private val interaction: Interaction? = null) :
 
         fun bind(item: Message) = with(itemView) {
 
-            msg_new.setText(item.message)
+            val msgNew = findViewById<EditText>(R.id.msg_new)
+            msgNew.setText(item.message)
 
-            new_okay.setOnClickListener {
-                interaction?.onNewDone(adapterPosition, msg_new.text.toString())
+            findViewById<ImageView>(R.id.new_okay).setOnClickListener {
+                interaction?.onNewDone(adapterPosition, msgNew.text.toString())
             }
 
-            new_cancel.setOnClickListener {
+            findViewById<ImageView>(R.id.new_cancel).setOnClickListener {
                 interaction?.onNewCancel(adapterPosition)
             }
 

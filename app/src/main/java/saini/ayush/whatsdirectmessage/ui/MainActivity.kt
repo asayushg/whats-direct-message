@@ -9,19 +9,23 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
 import android.view.inputmethod.InputMethodManager
+import android.widget.EditText
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.button.MaterialButton
 import com.google.android.material.snackbar.Snackbar
+import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.textview.MaterialTextView
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.countries_list.*
 import layout.PreFilledMsgAdapter
 import saini.ayush.whatsdirectmessage.R
 import saini.ayush.whatsdirectmessage.model.Country
 import saini.ayush.whatsdirectmessage.model.Message
-import saini.ayush.whatsdirectmessage.utils.Constants.countries
 import saini.ayush.whatsdirectmessage.utils.DataManager
 import javax.inject.Inject
 
@@ -48,17 +52,17 @@ class MainActivity : AppCompatActivity(), CountriesViewAdapter.Interaction,
     }
 
     private fun setListeners() {
-        country_flag.setOnClickListener(this)
-        country_code.setOnClickListener(this)
-        add_new_pre_filled_msg.setOnClickListener(this)
-        send_whatsapp.setOnClickListener(this)
+        findViewById<ImageView>(R.id.country_flag).setOnClickListener(this)
+        findViewById<TextView>(R.id.country_code).setOnClickListener(this)
+        findViewById<MaterialTextView>(R.id. add_new_pre_filled_msg).setOnClickListener(this)
+        findViewById<MaterialButton>(R.id.send_whatsapp).setOnClickListener(this)
 
         hideKeyboard()
 
-        phone.setText(viewModel.contact)
-        message.setText(viewModel.message)
+        findViewById<EditText>(R.id.phone).setText(viewModel.contact)
+        findViewById<TextInputEditText>(R.id.message).setText(viewModel.message)
 
-        phone.addTextChangedListener(object : TextWatcher {
+        findViewById<EditText>(R.id.phone).addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
             }
 
@@ -76,7 +80,7 @@ class MainActivity : AppCompatActivity(), CountriesViewAdapter.Interaction,
             }
         })
 
-        message.addTextChangedListener(object : TextWatcher {
+        findViewById<TextInputEditText>(R.id.message).addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
             }
 
@@ -101,7 +105,7 @@ class MainActivity : AppCompatActivity(), CountriesViewAdapter.Interaction,
     }
 
     override fun onItemSelected(position: Int, item: Message) {
-        message.setText(item.message)
+        findViewById<TextInputEditText>(R.id.message).setText(item.message)
         viewModel.setMessageValue(item.message)
     }
 
@@ -185,7 +189,7 @@ class MainActivity : AppCompatActivity(), CountriesViewAdapter.Interaction,
 
         val phoneNumberWithCountryCode = getContact()
         if (validatePhoneNumber()) {
-            Snackbar.make(header_title, "Please enter mobile number", Snackbar.LENGTH_LONG).show()
+            Snackbar.make(findViewById(R.id.message), "Please enter mobile number", Snackbar.LENGTH_LONG).show()
         } else {
             val uri = Uri.parse(
                 String.format(
@@ -240,7 +244,7 @@ class MainActivity : AppCompatActivity(), CountriesViewAdapter.Interaction,
 
                 messagesAdapter.notifyItemInserted(0)
                 messagesAdapter.notifyItemRangeInserted(0, 0)
-                preMessagesRV.scrollToPosition(0)
+                findViewById<RecyclerView>(R.id.preMessagesRV).scrollToPosition(0)
                 viewModel.setListToState()
 
             } else showSnackbar("Maximum messages can be 10")
@@ -250,11 +254,11 @@ class MainActivity : AppCompatActivity(), CountriesViewAdapter.Interaction,
     }
 
     private fun showSnackbar(msg: String) {
-        Snackbar.make(header_des, msg, Snackbar.LENGTH_SHORT).show()
+        Snackbar.make(findViewById<TextInputEditText>(R.id.message), msg, Snackbar.LENGTH_SHORT).show()
     }
 
     private fun initMessages() {
-        preMessagesRV.apply {
+        findViewById<RecyclerView>(R.id.preMessagesRV).apply {
             layoutManager = LinearLayoutManager(this@MainActivity)
             messagesAdapter =
                 PreFilledMsgAdapter(this@MainActivity)
@@ -267,14 +271,14 @@ class MainActivity : AppCompatActivity(), CountriesViewAdapter.Interaction,
 
 
     private fun setCountryCode() {
-        country_flag.setImageDrawable(
+        findViewById<ImageView>(R.id.country_flag).setImageDrawable(
             ContextCompat.getDrawable(
                 baseContext,
                 viewModel.selectedCountry.flag
             )
         )
 
-        country_code.text = viewModel.selectedCountry.dialCode
+        findViewById<TextView>(R.id.country_code).text = viewModel.selectedCountry.dialCode
     }
 
     private fun openBottomSheet() {

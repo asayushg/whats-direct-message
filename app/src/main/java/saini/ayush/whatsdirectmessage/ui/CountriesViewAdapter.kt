@@ -6,11 +6,11 @@ import android.view.ViewGroup
 import android.widget.Filter
 import android.widget.Filterable
 import android.widget.ImageView
+import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.synthetic.main.country_list_item.view.*
 import saini.ayush.whatsdirectmessage.R
 import saini.ayush.whatsdirectmessage.model.Country
 
@@ -104,9 +104,10 @@ class CountriesViewAdapter(
                 interaction?.onCountrySelected(adapterPosition, item)
             }
 
-            country_name.text = item.name
-            country_code.text = item.dialCode
-            country_flag.setImageDrawable(ContextCompat.getDrawable(context, item.flag))
+            itemView.findViewById<TextView>(R.id.country_name).text = item.name
+            itemView.findViewById<TextView>(R.id.country_code) .text = item.dialCode
+            itemView.findViewById<ImageView>(R.id.country_flag)
+                .setImageDrawable(ContextCompat.getDrawable(context, item.flag))
         }
     }
 

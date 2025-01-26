@@ -7,10 +7,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.SearchView
-import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import kotlinx.android.synthetic.main.countries_list.*
 import saini.ayush.whatsdirectmessage.R
 import saini.ayush.whatsdirectmessage.utils.Constants
 
@@ -20,12 +19,15 @@ class CountryListDialog : BottomSheetDialogFragment() {
     private lateinit var countriesViewAdapter: CountriesViewAdapter
     private var countriesList = Constants.countries
 
+    lateinit var layout: View
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.countries_list, container, false)
+    ): View {
+        layout =  inflater.inflate(R.layout.countries_list, container, false)
+        return layout
     }
 
     override fun onAttach(context: Context) {
@@ -42,7 +44,7 @@ class CountryListDialog : BottomSheetDialogFragment() {
 
     private fun setClickListeners() {
 
-        searchBar.setOnQueryTextListener(object: SearchView.OnQueryTextListener{
+        layout.findViewById<SearchView>(R.id.searchBar).setOnQueryTextListener(object: SearchView.OnQueryTextListener{
             override fun onQueryTextSubmit(query: String?): Boolean {
                 countriesViewAdapter.filter.filter(query)
                 return false
@@ -58,7 +60,7 @@ class CountryListDialog : BottomSheetDialogFragment() {
 
     private fun initRV() {
 
-        countryListRV.apply {
+        layout.findViewById<RecyclerView>(R.id.countryListRV).apply {
             layoutManager = LinearLayoutManager(requireContext())
             countriesViewAdapter =
                 CountriesViewAdapter(listener)
