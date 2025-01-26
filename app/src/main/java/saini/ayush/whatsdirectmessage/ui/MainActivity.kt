@@ -53,6 +53,8 @@ class MainActivity : AppCompatActivity(), CountriesViewAdapter.Interaction,
     private val viewModel: MainViewModel by viewModels()
     private lateinit var bottomSheet: CountryListDialog
 
+    private var callLogDialog: CallLogsDialog? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -126,10 +128,11 @@ class MainActivity : AppCompatActivity(), CountriesViewAdapter.Interaction,
             ActivityCompat.requestPermissions(this, arrayOf(callLogPermission), 101)
         } else {
             val logs = accessCallLogs()
-            CallLogsDialog(
+            callLogDialog = CallLogsDialog(
                 interaction = this,
                 callLogs = logs
-            ).show(supportFragmentManager, "TAG")
+            )
+            callLogDialog?.show(supportFragmentManager, "TAG")
         }
     }
 
@@ -141,10 +144,11 @@ class MainActivity : AppCompatActivity(), CountriesViewAdapter.Interaction,
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == 101 && grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             val logs = accessCallLogs()
-            CallLogsDialog(
+            callLogDialog = CallLogsDialog(
                 interaction = this,
                 callLogs = logs
-            ).show(supportFragmentManager, "TAG")
+            )
+            callLogDialog?.show(supportFragmentManager, "TAG")
         } else {
             // Handle permission denial
             Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show()
@@ -404,6 +408,7 @@ class MainActivity : AppCompatActivity(), CountriesViewAdapter.Interaction,
     }
 
     override fun onContactSelected(position: Int, item: CallLogEntry) {
+        callLogDialog?.dismiss()
         findViewById<EditText>(R.id.phone).setText(item.number)
     }
 
