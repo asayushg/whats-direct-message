@@ -1,19 +1,26 @@
 package saini.ayush.whatsdirectmessage.ui
 
+import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
+import android.provider.CallLog
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -24,15 +31,19 @@ import com.google.android.material.textview.MaterialTextView
 import dagger.hilt.android.AndroidEntryPoint
 import layout.PreFilledMsgAdapter
 import saini.ayush.whatsdirectmessage.R
+import saini.ayush.whatsdirectmessage.model.CallLogEntry
 import saini.ayush.whatsdirectmessage.model.Country
 import saini.ayush.whatsdirectmessage.model.Message
 import saini.ayush.whatsdirectmessage.utils.DataManager
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import javax.inject.Inject
 
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity(), CountriesViewAdapter.Interaction,
-    PreFilledMsgAdapter.Interaction, View.OnClickListener {
+    PreFilledMsgAdapter.Interaction, View.OnClickListener, CallLogsViewAdapter.Interaction {
 
     private lateinit var messagesAdapter: PreFilledMsgAdapter
 
@@ -97,7 +108,49 @@ class MainActivity : AppCompatActivity(), CountriesViewAdapter.Interaction,
                 }
             }
         })
+
+        findViewById<ImageView>(R.id.phone_logs).setOnClickListener{
+            showRecentCalls()
+        }
+
+        findViewById<TextView>(R.id.phone_logs_title).setOnClickListener {
+            showRecentCalls()
+        }
+
     }
+
+    private fun showRecentCalls() {
+        val callLogPermission = Manifest.permission.READ_CALL_LOG
+
+        if (ContextCompat.checkSelfPermission(this, callLogPermission) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, arrayOf(callLogPermission), 101)
+        } else {
+            val logs = accessCallLogs()
+            CallLogsDialog(
+                interaction = this,
+                callLogs = logs
+            ).show(supportFragmentManager, "TAG")
+        }
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == 101 && grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            val logs = accessCallLogs()
+            CallLogsDialog(
+                interaction = this,
+                callLogs = logs
+            ).show(supportFragmentManager, "TAG")
+        } else {
+            // Handle permission denial
+            Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show()
+        }
+    }
+
 
     override fun onCountrySelected(position: Int, item: Country) {
         viewModel.temp_selectedCountry = item
@@ -300,6 +353,58 @@ class MainActivity : AppCompatActivity(), CountriesViewAdapter.Interaction,
 
     private fun Activity.hideKeyboard() {
         hideKeyboard(currentFocus ?: View(this))
+    }
+
+
+    @SuppressLint("Range") // Suppress warnings about deprecated getColumnIndexOrThrow
+    private fun accessCallLogs(): List<CallLogEntry> {
+        val callLogs = mutableListOf<CallLogEntry>()
+        val callLogUri = CallLog.Calls.CONTENT_URI
+        val projection = arrayOf(
+            CallLog.Calls.NUMBER,       // Phone number
+            CallLog.Calls.TYPE,         // Call type
+            CallLog.Calls.DATE,         // Call date
+            CallLog.Calls.DURATION      // Call duration
+        )
+
+        val cursor = contentResolver.query(
+            callLogUri,
+            projection,
+            null,
+            null,
+            "${CallLog.Calls.DATE} DESC" // Sort by most recent calls
+        )
+
+        cursor?.use {
+            while (it.moveToNext()) {
+                val number = it.getString(it.getColumnIndexOrThrow(CallLog.Calls.NUMBER))
+                val typeCode = it.getInt(it.getColumnIndexOrThrow(CallLog.Calls.TYPE))
+                val date = it.getLong(it.getColumnIndexOrThrow(CallLog.Calls.DATE))
+                val duration = it.getInt(it.getColumnIndexOrThrow(CallLog.Calls.DURATION))
+
+                // Convert typeCode to a readable string
+                val type = when (typeCode) {
+                    CallLog.Calls.INCOMING_TYPE -> "Incoming"
+                    CallLog.Calls.OUTGOING_TYPE -> "Outgoing"
+                    CallLog.Calls.MISSED_TYPE -> "Missed"
+                    CallLog.Calls.REJECTED_TYPE -> "Rejected"
+                    else -> "Unknown"
+                }
+
+                // Format the date and duration
+                val formattedDate = SimpleDateFormat("dd-MM-yyyy HH:mm:ss", Locale.getDefault()).format(Date(date))
+                val formattedDuration = "$duration sec"
+
+                // Add to list
+                callLogs.add(CallLogEntry(number, type, formattedDate, formattedDuration))
+            }
+        }
+        Log.d("@AYUSH", "accessCallLogs: $callLogs")
+        return callLogs
+    }
+
+    override fun onContactSelected(position: Int, item: CallLogEntry) {
+        findViewById<EditText>(R.id.phone).setText(item.number)
     }
 
 

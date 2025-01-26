@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="?attr/colorSecondary"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/selectCallLogs"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/card_bottom_bg"
+        android:text="@string/select_contact_number"
+        android:textColor="?attr/colorOnPrimary"
+        android:padding="12dp"
+        android:textAlignment="center" />
+
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/callLogsRV"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        android:layout_marginHorizontal="16dp"/>
+
+
+</LinearLayout>
